@@ -33,8 +33,7 @@ class PromoForm
                                 ->columnSpanFull(),
                             TextInput::make('highlight')
                                 ->label('Teks besar')
-                                ->helperText('Mis. 20%, Gratis, B1G1, Poin 3x')
-                                ->required()
+                                ->helperText('Opsional. Mis. 20%, Gratis, B1G1. Kosongkan bila gambar promo sudah berisi teks — banner menampilkan gambarnya saja.')
                                 ->maxLength(32),
                             TextInput::make('highlight_caption')
                                 ->label('Keterangan kecil')
@@ -156,7 +155,7 @@ class PromoForm
                         ->visible(fn (Get $get) => $get('type') !== Promo::TYPE_BIRTHDAY),
                 ]),
             Section::make('Gambar promo (16:9)')
-                ->description('Foto produk asli, tanpa teks di dalam gambar — judul & teks besar ditulis aplikasi.')
+                ->description('Foto produk (teks besar & judul ditulis aplikasi), atau desain banner yang sudah berisi teks — untuk yang ini kosongkan Teks besar, dan jauhkan teks dari ±15% bagian bawah gambar karena tertutup kartu poin di Beranda.')
                 ->schema([
                     FileUpload::make('image_path')
                         ->hiddenLabel()

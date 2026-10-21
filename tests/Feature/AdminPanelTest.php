@@ -241,6 +241,23 @@ class AdminPanelTest extends TestCase
         $this->getJson('/api/v1/promos')->assertJsonFragment(['title' => 'Diskon 30% semua ramen', 'is_universal' => true]);
     }
 
+    public function test_promo_banner_with_text_in_the_image_needs_no_highlight(): void
+    {
+        $this->actingAs($this->admin());
+
+        Livewire::test(CreatePromo::class)
+            ->fillForm([
+                'title' => 'Es teh gratis tiap Jumat',
+                'starts_at' => now()->toDateString(),
+                'ends_at' => now()->addWeek()->toDateString(),
+                'is_active' => true,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->getJson('/api/v1/promos')->assertJsonFragment(['title' => 'Es teh gratis tiap Jumat', 'highlight' => null]);
+    }
+
     public function test_voucher_promo_made_on_web_is_claimed_in_the_app_and_listed_in_the_panel(): void
     {
         $admin = $this->admin();

@@ -45,7 +45,8 @@ class PromosTable
                 TextColumn::make('highlight')
                     ->label('Teks besar')
                     ->badge()
-                    ->color('primary'),
+                    ->color('primary')
+                    ->placeholder('—'),
                 TextColumn::make('type')
                     ->label('Jenis')
                     ->badge()
