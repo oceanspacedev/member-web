@@ -277,10 +277,10 @@ class VoucherService
                 $this->fail('Voucher ini tidak dipakai pada struk tersebut di outlet ini.');
             }
             if ($locked->partner_key_id === null) {
-                $this->fail('Voucher ini dipakai lewat kasir Ocean Space dan tidak bisa dibatalkan dari POS.');
+                $this->fail('Voucher ini dipakai lewat kasir Space Club dan tidak bisa dibatalkan dari POS.');
             }
             if ($locked->used_at->lt(now()->subHours(self::PARTNER_CANCEL_HOURS))) {
-                $this->fail('Batas waktu pembatalan ('.self::PARTNER_CANCEL_HOURS.' jam) sudah lewat. Hubungi admin Ocean Space.');
+                $this->fail('Batas waktu pembatalan ('.self::PARTNER_CANCEL_HOURS.' jam) sudah lewat. Hubungi admin Space Club.');
             }
 
             $locked->forceFill([

@@ -81,7 +81,7 @@ class AdminPanelTest extends TestCase
         $member = User::factory()->create();
         $this->actingAs($member)->get('/admin')->assertForbidden();
 
-        $this->actingAs($this->admin())->get('/admin')->assertOk()->assertSee('Ocean Space');
+        $this->actingAs($this->admin())->get('/admin')->assertOk()->assertSee('Space Club');
     }
 
     public function test_whatsapp_login_is_hidden_until_waghub_is_configured(): void

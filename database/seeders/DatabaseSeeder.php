@@ -106,7 +106,7 @@ class DatabaseSeeder extends Seeder
         ])->save();
 
         // Admin: masuk lewat WhatsApp OTP (nomor di atas) atau email + password dari .env (ADMIN_EMAIL / ADMIN_PASSWORD).
-        $admin = User::firstOrCreate(['phone' => '6281200000003'], ['name' => 'Admin Ocean Space', 'phone_verified_at' => now()]);
+        $admin = User::firstOrCreate(['phone' => '6281200000003'], ['name' => 'Admin Space Club', 'phone_verified_at' => now()]);
         $admin->forceFill(['role' => User::ROLE_ADMIN]);
         if (filled(config('loyalty.admin.email')) && filled(config('loyalty.admin.password'))) {
             $admin->forceFill([

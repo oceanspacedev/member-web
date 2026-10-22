@@ -31,7 +31,7 @@ class VoucherQr
         $parts = explode('.', trim($payload));
 
         if (count($parts) !== 4 || $parts[0] !== self::PREFIX || ! ctype_digit($parts[2])) {
-            throw ValidationException::withMessages(['qr' => 'QR bukan QR voucher Ocean Space.']);
+            throw ValidationException::withMessages(['qr' => 'QR bukan QR voucher Space Club.']);
         }
 
         [, $code, $expires, $signature] = $parts;

@@ -85,7 +85,7 @@ class AccessControlTest extends TestCase
 
         $this->get('/log-viewer')->assertOk();
         $this->get('/docs/api')->assertOk();
-        $this->get('/docs/api.json')->assertOk()->assertJsonPath('info.title', 'Ocean Space API');
+        $this->get('/docs/api.json')->assertOk()->assertJsonPath('info.title', 'Space Club API');
         $this->getJson('/log-viewer/api/folders')->assertOk();
         $this->get('/horizon')->assertOk();
         $this->get('/admin/brands')->assertForbidden();

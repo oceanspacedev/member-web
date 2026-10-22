@@ -48,11 +48,11 @@ return [
         /*
          * Description rendered on the home page of the API documentation (`/docs/api`).
          */
-        'description' => 'API Ocean Space Member Club. **Aplikasi mobile** (`/api/v1`): endpoint terproteksi memakai token Sanctum (Bearer) dari login OTP. **Partner POS** (`/api/partner/v1`, untuk iSeller, Moka, Majoo, Olsera, dll.): Ocean Space memvalidasi voucher member; autentikasi `Authorization: Bearer osk_...` dengan API key per outlet dari panel admin (Akses & sistem → API partner POS).',
+        'description' => 'API Space Club. **Aplikasi mobile** (`/api/v1`): endpoint terproteksi memakai token Sanctum (Bearer) dari login OTP. **Partner POS** (`/api/partner/v1`, untuk iSeller, Moka, Majoo, Olsera, dll.): Space Club memvalidasi voucher member; autentikasi `Authorization: Bearer osk_...` dengan API key per outlet dari panel admin (Akses & sistem → API partner POS).',
     ],
 
     'ui' => [
-        'title' => 'Ocean Space API',
+        'title' => 'Space Club API',
     ],
 
     /*

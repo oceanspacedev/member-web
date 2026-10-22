@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 /**
- * API partner POS: Ocean Space sebagai validator voucher member.
+ * API partner POS: Space Club sebagai validator voucher member.
  *
  * Alur di kasir: member menyebutkan/menunjukkan kode voucher → POS memanggil `check` →
  * bila valid, POS memasang potongan lalu memanggil `redeem` dengan nomor struk.

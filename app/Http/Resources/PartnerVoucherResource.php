@@ -27,7 +27,7 @@ class PartnerVoucherResource extends JsonResource
             'value' => $this->value,
             /** Minimal belanja (rupiah), 0 = tanpa minimal. */
             'min_spend' => $this->min_spend,
-            /** Brand tempat voucher berlaku; null = semua brand Ocean Space. */
+            /** Brand tempat voucher berlaku; null = semua brand Space Club. */
             'brand' => $this->brand?->name,
             'expires_at' => $this->expires_at->timezone($tz)->toIso8601String(),
             'used_at' => $this->used_at?->timezone($tz)->toIso8601String(),

@@ -10,7 +10,7 @@
     $outlets = (int) $directory['outlets'];
     $birthday = collect($tiers)->filter(fn ($tier) => in_array('Voucher ulang tahun', $tier['perks'], true))->pluck('label')->join(' dan ');
 
-    $title = $app.' Member Club: satu kartu member untuk semua brand';
+    $title = $app.': satu kartu member untuk semua brand';
     $description = 'Foto struk belanja, poin langsung masuk, tukar jadi voucher, dan naik level untuk cashback lebih besar. Satu kartu member berlaku di semua brand grup '.$app.'. Gratis untuk iPhone dan Android.';
     $ogImage = asset('images/og-ocean-space.png');
     $cssVersion = @filemtime(public_path('css/landing.css')) ?: 1;
@@ -29,7 +29,7 @@
         '@graph' => [
             array_filter([
                 '@type' => 'MobileApplication',
-                'name' => $app.' Member Club',
+                'name' => $app,
                 'description' => $description,
                 'url' => url('/'),
                 'image' => $ogImage,
@@ -69,7 +69,7 @@
     <meta property="og:image" content="{{ $ogImage }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Logo {{ $app }} Member Club: satu kartu member untuk semua brand">
+    <meta property="og:image:alt" content="Logo {{ $app }}: satu kartu member untuk semua brand">
     <meta name="twitter:card" content="summary_large_image">
 
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48">
@@ -109,7 +109,7 @@
     <section class="hero">
         <div class="wrap hero__grid">
             <div class="hero__copy">
-                <p class="eyebrow">{{ $app }} Member Club</p>
+                <p class="eyebrow">{{ $app }}</p>
                 <h1>Satu kartu member untuk <em>semua brand</em> {{ $app }}</h1>
                 <p class="lead">Belanja di brand favoritmu, foto struknya, dan poin langsung masuk. Tukar jadi voucher, naik level, lalu nikmati cashback yang makin besar.</p>
 

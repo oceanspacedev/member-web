@@ -145,7 +145,7 @@ class ReceiptAutoVerificationTest extends TestCase
     public function test_problems_the_member_can_fix_are_rejected_immediately_with_a_clear_reason(): void
     {
         $this->send(['is_receipt' => false] + $this->clearReceipt(), 601);
-        $this->assertSame('Foto ini bukan struk belanja. Foto struk dari kasir outlet Ocean Space.', $this->latest()->reject_reason);
+        $this->assertSame('Foto ini bukan struk belanja. Foto struk dari kasir outlet Space Club.', $this->latest()->reject_reason);
 
         $this->send($this->clearReceipt(['legible' => false, 'receipt_number' => null]), 602);
         $this->assertSame(ReceiptVerifier::UNREADABLE, $this->latest()->reject_reason);

@@ -56,8 +56,8 @@ class OtpService
     {
         $minutes = intdiv($ttl, 60);
 
-        return "Kode verifikasi *Ocean Space* kamu:\n\n*{$code}*\n\n"
-            ."Berlaku {$minutes} menit. Jangan bagikan kode ini kepada siapa pun, termasuk yang mengaku dari Ocean Space.";
+        return "Kode verifikasi *Space Club* kamu:\n\n*{$code}*\n\n"
+            ."Berlaku {$minutes} menit. Jangan bagikan kode ini kepada siapa pun, termasuk yang mengaku dari Space Club.";
     }
 
     /**

@@ -75,7 +75,7 @@ Route::prefix('v1')->group(function () {
     });
 });
 
-// API partner POS (iSeller, Moka, Majoo, Olsera, ...): Ocean Space memvalidasi voucher member.
+// API partner POS (iSeller, Moka, Majoo, Olsera, ...): Space Club memvalidasi voucher member.
 // Autentikasi dengan API key per outlet yang dibuat di panel admin (Akses & sistem → API partner POS).
 Route::prefix('partner/v1')->middleware([AuthenticatePartnerKey::class, 'throttle:partner'])->group(function () {
     Route::get('outlet', [PartnerVoucherController::class, 'outlet']);

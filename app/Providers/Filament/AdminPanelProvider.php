@@ -50,7 +50,7 @@ class AdminPanelProvider extends PanelProvider
             ->profile(isSimple: false)
             ->registration(null)
             ->passwordReset(null)
-            ->brandName('Ocean Space')
+            ->brandName('Space Club')
             ->brandLogo(asset('media/brand/logo-mark.svg'))
             ->brandLogoHeight('2rem')
             ->favicon(asset('media/brand/favicon.png'))

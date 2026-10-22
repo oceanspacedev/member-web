@@ -31,7 +31,7 @@ class ReceiptVerifier
         $confident = $reading->confidence >= $cfg['min_confidence'];
 
         if (! $reading->isReceipt) {
-            return $this->reject('Foto ini bukan struk belanja. Foto struk dari kasir outlet Ocean Space.');
+            return $this->reject('Foto ini bukan struk belanja. Foto struk dari kasir outlet Space Club.');
         }
 
         $purchased = $this->parseDate($reading->purchasedAt, $tz);

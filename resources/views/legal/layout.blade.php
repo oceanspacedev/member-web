@@ -42,7 +42,7 @@
             <path fill="#C8A464" transform="rotate(180 20 20)" d="M18.5 18.5H9.25A9.25 9.25 0 0 1 0 9.25A9.25 9.25 0 0 1 9.25 0A9.25 9.25 0 0 1 18.5 9.25Z"/>
             <path fill="#E6CF9C" transform="rotate(270 20 20)" d="M18.5 18.5H9.25A9.25 9.25 0 0 1 0 9.25A9.25 9.25 0 0 1 9.25 0A9.25 9.25 0 0 1 18.5 9.25Z"/>
         </svg>
-        <div><strong>{{ config('app.name') }}</strong><br><span>Member Club</span></div>
+        <div><strong>{{ config('app.name') }}</strong><br><span>Program member</span></div>
     </div>
 </header>
 

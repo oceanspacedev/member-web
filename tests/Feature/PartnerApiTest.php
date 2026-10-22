@@ -17,7 +17,7 @@ use Livewire\Livewire;
 use Tests\TestCase;
 
 /**
- * API partner POS (iSeller, Moka, Majoo, Olsera, ...): Ocean Space sebagai validator voucher.
+ * API partner POS (iSeller, Moka, Majoo, Olsera, ...): Space Club sebagai validator voucher.
  */
 class PartnerApiTest extends TestCase
 {
@@ -200,7 +200,7 @@ class PartnerApiTest extends TestCase
 
         $this->postJson('/api/partner/v1/vouchers/cancel', ['code' => 'ABCDEFGHJK', 'reference' => 'STRUK-1'], $this->headers($this->araichi))
             ->assertUnprocessable()
-            ->assertJsonPath('errors.voucher.0', 'Voucher ini dipakai lewat kasir Ocean Space dan tidak bisa dibatalkan dari POS.');
+            ->assertJsonPath('errors.voucher.0', 'Voucher ini dipakai lewat kasir Space Club dan tidak bisa dibatalkan dari POS.');
     }
 
     public function test_our_cashier_app_accepts_a_typed_voucher_code(): void

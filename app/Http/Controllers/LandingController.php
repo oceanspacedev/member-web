@@ -13,7 +13,7 @@ use Throwable;
 class LandingController extends Controller
 {
     /**
-     * Landing page publik: apa itu Ocean Space Member Club, cara kerja, level, brand, dan tautan unduh.
+     * Landing page publik: apa itu Space Club, cara kerja, level, brand, dan tautan unduh.
      */
     public function show(): View
     {

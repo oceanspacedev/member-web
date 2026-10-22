@@ -180,7 +180,7 @@ class ReceiptService
         });
 
         $points = number_format($claim->transaction->points, 0, ',', '.');
-        $this->notify($claim, "Struk belanja kamu di *{$claim->outlet->name}* sudah diverifikasi. +{$points} poin masuk ke akun Ocean Space kamu.");
+        $this->notify($claim, "Struk belanja kamu di *{$claim->outlet->name}* sudah diverifikasi. +{$points} poin masuk ke akun Space Club kamu.");
 
         return $claim;
     }

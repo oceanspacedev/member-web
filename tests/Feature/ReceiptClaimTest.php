@@ -197,12 +197,12 @@ class ReceiptClaimTest extends TestCase
         $this->actingAs($this->admin(), 'web');
 
         Livewire::test(ListReceiptClaims::class)
-            ->callAction(TestAction::make('reject')->table($claim), ['reason' => 'Struk bukan dari outlet Ocean Space.'])
+            ->callAction(TestAction::make('reject')->table($claim), ['reason' => 'Struk bukan dari outlet Space Club.'])
             ->assertHasNoFormErrors();
 
         $this->assertSame(ReceiptClaim::STATUS_REJECTED, $claim->fresh()->status);
         $this->assertSame(0, PointTransaction::count());
-        $this->assertStringContainsString('Struk bukan dari outlet Ocean Space.', end($this->sent)['message']);
+        $this->assertStringContainsString('Struk bukan dari outlet Space Club.', end($this->sent)['message']);
 
         // Setelah ditolak, struk yang sama boleh dikirim ulang dengan foto yang lebih jelas.
         $this->submit([], $this->photo(800))->assertCreated();

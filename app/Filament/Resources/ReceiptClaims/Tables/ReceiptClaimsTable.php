@@ -27,7 +27,7 @@ class ReceiptClaimsTable
         'Foto struk tidak jelas/terpotong. Kirim ulang foto yang lebih jelas.',
         'Struk dari outlet lain, bukan outlet yang dipilih.',
         'Struk sudah melewati batas waktu klaim.',
-        'Struk bukan dari outlet Ocean Space.',
+        'Struk bukan dari outlet Space Club.',
         'Struk sudah pernah diklaim.',
     ];
 

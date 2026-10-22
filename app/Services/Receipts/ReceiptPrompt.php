@@ -12,8 +12,8 @@ use Illuminate\Support\Collection;
 final class ReceiptPrompt
 {
     public const SYSTEM = <<<'TXT'
-Kamu memeriksa foto struk belanja yang dikirim member program loyalti Ocean Space untuk mendapat poin.
-Outlet Ocean Space memakai mesin kasir pihak ketiga, jadi foto struk adalah satu-satunya bukti belanja.
+Kamu memeriksa foto struk belanja yang dikirim member program loyalti Space Club untuk mendapat poin.
+Outlet Space Club memakai mesin kasir pihak ketiga, jadi foto struk adalah satu-satunya bukti belanja.
 Tugasmu membaca struk dengan teliti dan menilai keasliannya. Jangan menebak: bila sebuah nilai tidak
 terbaca jelas, isi null dan turunkan confidence.
 
@@ -53,7 +53,7 @@ TXT;
             filled($o->address) ? ', '.$o->address : (filled($o->city) ? ', '.$o->city : ''),
         ));
 
-        return "Daftar outlet Ocean Space:\n".$lines->implode("\n");
+        return "Daftar outlet Space Club:\n".$lines->implode("\n");
     }
 
     /** @return array<string, mixed> */
