@@ -11,22 +11,23 @@
     <meta name="robots" content="index, follow">
     <title>@yield('title') · {{ config('app.name') }}</title>
     <style>
-        :root { --ink: #18181b; --ink-soft: #3f3f46; --muted: #67676f; --line: #e7e5e4; --ground: #f7f7f5; --gold: #c8a464; --gold-text: #7a5f2a; --gold-soft: #f4eedf; }
+        /* Palet biru sapphire, sama dengan aplikasi (mobile/src/constants/theme.ts). */
+        :root { --ink: #0f172a; --ink-soft: #334155; --muted: #5f6c80; --line: #e2e8f0; --ground: #f4f7fc; --sapphire: #1e40af; --accent-on-dark: #9dbcfa; --accent-text: #1d4ed8; --accent-soft: #eaf0fe; --accent-line: #c7d6fb; }
         * { box-sizing: border-box; }
         body { margin: 0; background: var(--ground); color: var(--ink-soft); font: 16px/1.7 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-text-size-adjust: 100%; }
-        header { background: var(--ink); }
+        header { background: var(--sapphire); }
         .bar { max-width: 760px; margin: 0 auto; padding: 18px 20px; display: flex; align-items: center; gap: 12px; color: #fff; }
         .bar svg { width: 30px; height: 30px; flex: none; }
         .bar strong { font-size: 17px; letter-spacing: -0.2px; }
-        .bar span { color: var(--gold); font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
+        .bar span { color: var(--accent-on-dark); font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
         main { max-width: 760px; margin: 0 auto; padding: 32px 20px 24px; }
         h1 { margin: 0 0 4px; color: var(--ink); font-size: 30px; line-height: 1.2; letter-spacing: -0.6px; }
         h2 { margin: 32px 0 8px; color: var(--ink); font-size: 19px; line-height: 1.3; }
         p, ul, ol { margin: 0 0 14px; }
         li { margin-bottom: 6px; }
-        a { color: var(--gold-text); font-weight: 600; }
+        a { color: var(--accent-text); font-weight: 600; }
         .meta { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
-        .note { background: var(--gold-soft); border: 1px solid #e4d6b8; border-radius: 14px; padding: 14px 16px; color: var(--ink); }
+        .note { background: var(--accent-soft); border: 1px solid var(--accent-line); border-radius: 14px; padding: 14px 16px; color: var(--ink); }
         .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; }
         .card p:last-child, .card ul:last-child { margin-bottom: 0; }
         footer { max-width: 760px; margin: 0 auto; padding: 8px 20px 48px; color: var(--muted); font-size: 14px; }
@@ -37,10 +38,10 @@
 <header>
     <div class="bar">
         <svg viewBox="0 0 40 40" aria-hidden="true">
-            <path fill="#C8A464" d="M18.5 18.5H9.25A9.25 9.25 0 0 1 0 9.25A9.25 9.25 0 0 1 9.25 0A9.25 9.25 0 0 1 18.5 9.25Z"/>
-            <path fill="#E6CF9C" transform="rotate(90 20 20)" d="M18.5 18.5H9.25A9.25 9.25 0 0 1 0 9.25A9.25 9.25 0 0 1 9.25 0A9.25 9.25 0 0 1 18.5 9.25Z"/>
-            <path fill="#C8A464" transform="rotate(180 20 20)" d="M18.5 18.5H9.25A9.25 9.25 0 0 1 0 9.25A9.25 9.25 0 0 1 9.25 0A9.25 9.25 0 0 1 18.5 9.25Z"/>
-            <path fill="#E6CF9C" transform="rotate(270 20 20)" d="M18.5 18.5H9.25A9.25 9.25 0 0 1 0 9.25A9.25 9.25 0 0 1 9.25 0A9.25 9.25 0 0 1 18.5 9.25Z"/>
+            <path fill="#9DBCFA" d="M18.5 18.5H9.25A9.25 9.25 0 0 1 0 9.25A9.25 9.25 0 0 1 9.25 0A9.25 9.25 0 0 1 18.5 9.25Z"/>
+            <path fill="#FFFFFF" transform="rotate(90 20 20)" d="M18.5 18.5H9.25A9.25 9.25 0 0 1 0 9.25A9.25 9.25 0 0 1 9.25 0A9.25 9.25 0 0 1 18.5 9.25Z"/>
+            <path fill="#9DBCFA" transform="rotate(180 20 20)" d="M18.5 18.5H9.25A9.25 9.25 0 0 1 0 9.25A9.25 9.25 0 0 1 9.25 0A9.25 9.25 0 0 1 18.5 9.25Z"/>
+            <path fill="#FFFFFF" transform="rotate(270 20 20)" d="M18.5 18.5H9.25A9.25 9.25 0 0 1 0 9.25A9.25 9.25 0 0 1 9.25 0A9.25 9.25 0 0 1 18.5 9.25Z"/>
         </svg>
         <div><strong>{{ config('app.name') }}</strong><br><span>Program member</span></div>
     </div>

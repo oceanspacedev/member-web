@@ -1,15 +1,15 @@
-{{-- Sprite ikon landing page. Ikon duotone sama dengan ikon menu aplikasi (mobile/src/components/menu-icon.tsx). --}}
+{{-- Sprite ikon landing page. Ikon duotone & warnanya sama dengan ikon menu aplikasi (mobile/src/components/menu-icon.tsx). --}}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
     <defs>
         <path id="p-petal" d="M18.5 18.5H9.25A9.25 9.25 0 0 1 0 9.25A9.25 9.25 0 0 1 9.25 0A9.25 9.25 0 0 1 18.5 9.25Z"/>
     </defs>
 
-    {{-- Logo: empat kelopak --}}
+    {{-- Logo: empat kelopak (logoPetals di aplikasi), dipakai di atas latar sapphire --}}
     <symbol id="i-logo" viewBox="0 0 40 40">
-        <use href="#p-petal" fill="#C8A464"/>
-        <use href="#p-petal" fill="#E6CF9C" transform="rotate(90 20 20)"/>
-        <use href="#p-petal" fill="#C8A464" transform="rotate(180 20 20)"/>
-        <use href="#p-petal" fill="#E6CF9C" transform="rotate(270 20 20)"/>
+        <use href="#p-petal" fill="#9DBCFA"/>
+        <use href="#p-petal" fill="#FFFFFF" transform="rotate(90 20 20)"/>
+        <use href="#p-petal" fill="#9DBCFA" transform="rotate(180 20 20)"/>
+        <use href="#p-petal" fill="#FFFFFF" transform="rotate(270 20 20)"/>
     </symbol>
     <symbol id="i-logo-mono" viewBox="0 0 40 40">
         <use href="#p-petal" fill="currentColor"/>
@@ -20,19 +20,19 @@
 
     {{-- Ikon fitur (kotak 48) --}}
     <symbol id="i-vouchers" viewBox="0 0 48 48">
-        <path d="M8 13H40A3 3 0 0 1 43 16V20A4 4 0 0 0 43 28V32A3 3 0 0 1 40 35H8A3 3 0 0 1 5 32V28A4 4 0 0 0 5 20V16A3 3 0 0 1 8 13Z" fill="#C8A464"/>
+        <path d="M8 13H40A3 3 0 0 1 43 16V20A4 4 0 0 0 43 28V32A3 3 0 0 1 40 35H8A3 3 0 0 1 5 32V28A4 4 0 0 0 5 20V16A3 3 0 0 1 8 13Z" fill="#7EA7F5"/>
         <path d="M31 17V31" stroke-dasharray="2 3.2"/>
-        <use href="#p-petal" transform="translate(12.5 19.4) scale(0.5)" fill="#18181B" stroke="none"/>
+        <use href="#p-petal" transform="translate(12.5 19.4) scale(0.5)" fill="#172F86" stroke="none"/>
     </symbol>
     <symbol id="i-buy" viewBox="0 0 48 48">
         <path d="M18 20V15A6 6 0 0 1 30 15V20"/>
-        <path d="M11 18H37L35 39A3 3 0 0 1 32 42H16A3 3 0 0 1 13 39Z" fill="#C8A464"/>
-        <use href="#p-petal" transform="translate(19.4 25) scale(0.5)" fill="#F3E7CB" stroke-width="4.4"/>
+        <path d="M11 18H37L35 39A3 3 0 0 1 32 42H16A3 3 0 0 1 13 39Z" fill="#7EA7F5"/>
+        <use href="#p-petal" transform="translate(19.4 25) scale(0.5)" fill="#EAF0FE" stroke-width="4.4"/>
     </symbol>
     <symbol id="i-points" viewBox="0 0 48 48">
-        <circle cx="30" cy="17" r="10" fill="#EBD9B0"/>
-        <circle cx="19" cy="29" r="11.5" fill="#C8A464"/>
-        <g stroke="none" fill="#18181B" transform="translate(13.4 23.4) scale(0.28)">
+        <circle cx="30" cy="17" r="10" fill="#C7D6FB"/>
+        <circle cx="19" cy="29" r="11.5" fill="#7EA7F5"/>
+        <g stroke="none" fill="#172F86" transform="translate(13.4 23.4) scale(0.28)">
             <use href="#p-petal"/>
             <use href="#p-petal" transform="rotate(90 20 20)"/>
             <use href="#p-petal" transform="rotate(180 20 20)"/>
@@ -40,34 +40,34 @@
         </g>
     </symbol>
     <symbol id="i-promo" viewBox="0 0 48 48">
-        <use href="#p-petal" transform="translate(6 6) scale(1.95)" fill="#C8A464" stroke-width="1.13"/>
+        <use href="#p-petal" transform="translate(6 6) scale(1.95)" fill="#7EA7F5" stroke-width="1.13"/>
         <circle cx="17" cy="17" r="3"/>
         <circle cx="28" cy="28" r="3"/>
         <path d="M29.5 14.5 15.5 30.5"/>
     </symbol>
     <symbol id="i-outlet" viewBox="0 0 48 48">
-        <path d="M10 20V38A2 2 0 0 0 12 40H36A2 2 0 0 0 38 38V20" fill="#EBD9B0"/>
-        <path d="M7 16 10 8H38L41 16A4.25 4.25 0 0 1 32.5 16A4.25 4.25 0 0 1 24 16A4.25 4.25 0 0 1 15.5 16A4.25 4.25 0 0 1 7 16Z" fill="#C8A464"/>
-        <path d="M20 40V30A4 4 0 0 1 28 30V40" fill="#C8A464"/>
+        <path d="M10 20V38A2 2 0 0 0 12 40H36A2 2 0 0 0 38 38V20" fill="#C7D6FB"/>
+        <path d="M7 16 10 8H38L41 16A4.25 4.25 0 0 1 32.5 16A4.25 4.25 0 0 1 24 16A4.25 4.25 0 0 1 15.5 16A4.25 4.25 0 0 1 7 16Z" fill="#7EA7F5"/>
+        <path d="M20 40V30A4 4 0 0 1 28 30V40" fill="#7EA7F5"/>
     </symbol>
     <symbol id="i-brands" viewBox="0 0 48 48">
         <g stroke-width="2.3" transform="translate(5 5) scale(0.95)">
-            <use href="#p-petal" fill="#C8A464"/>
-            <use href="#p-petal" fill="#EBD9B0" transform="rotate(90 20 20)"/>
-            <use href="#p-petal" fill="#C8A464" transform="rotate(180 20 20)"/>
-            <use href="#p-petal" fill="#EBD9B0" transform="rotate(270 20 20)"/>
+            <use href="#p-petal" fill="#7EA7F5"/>
+            <use href="#p-petal" fill="#C7D6FB" transform="rotate(90 20 20)"/>
+            <use href="#p-petal" fill="#7EA7F5" transform="rotate(180 20 20)"/>
+            <use href="#p-petal" fill="#C7D6FB" transform="rotate(270 20 20)"/>
         </g>
     </symbol>
     <symbol id="i-history" viewBox="0 0 48 48">
-        <path d="M11 6H35V41L31 38.5 27 41 23 38.5 19 41 15 38.5 11 41Z" fill="#EBD9B0"/>
+        <path d="M11 6H35V41L31 38.5 27 41 23 38.5 19 41 15 38.5 11 41Z" fill="#C7D6FB"/>
         <path d="M16 14H30M16 20H30M16 26H23"/>
-        <circle cx="33" cy="33" r="7.5" fill="#C8A464"/>
+        <circle cx="33" cy="33" r="7.5" fill="#7EA7F5"/>
         <path d="M33 29.5V36.5M29.5 33H36.5"/>
     </symbol>
     <symbol id="i-level" viewBox="0 0 48 48">
-        <path d="M7 17 15.5 25 24 11 32.5 25 41 17 37.5 35H10.5Z" fill="#C8A464"/>
-        <rect x="10.5" y="35" width="27" height="5" rx="1.5" fill="#EBD9B0"/>
-        <use href="#p-petal" transform="translate(20.3 23.5) scale(0.4)" fill="#18181B" stroke="none"/>
+        <path d="M7 17 15.5 25 24 11 32.5 25 41 17 37.5 35H10.5Z" fill="#7EA7F5"/>
+        <rect x="10.5" y="35" width="27" height="5" rx="1.5" fill="#C7D6FB"/>
+        <use href="#p-petal" transform="translate(20.3 23.5) scale(0.4)" fill="#172F86" stroke="none"/>
     </symbol>
 
     {{-- Ikon garis kecil (kotak 24) --}}

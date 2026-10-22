@@ -38,7 +38,7 @@ class AdminPanelProvider extends PanelProvider
             // Tema Mekaya (sama dengan panel WMS): sidebar, topbar, kartu, tabel yang ringkas.
             ->plugin(
                 MekayaPlugin::make()
-                    ->colors(['primary' => self::charcoal()])
+                    ->colors(['primary' => self::sapphire(), 'gray' => Color::Slate])
                     ->sidebarWidth('16rem'),
             )
             ->viteTheme('resources/css/app.css')
@@ -115,26 +115,27 @@ class AdminPanelProvider extends PanelProvider
     }
 
     /**
-     * Palet monokrom aplikasi: tombol & menu aktif hitam arang (shade 600/700 = #27272A/#18181B),
-     * shade terang abu hangat untuk latar sorotan. Color::hex() tidak dipakai karena memakai
+     * Palet biru sapphire, sama dengan aplikasi mobile (mobile/src/constants/theme.ts): tombol & menu
+     * aktif = primary #1E40AF (shade 600), hover = primaryDark #172F86 (700), shade terang dari
+     * primarySoft/accentLine/accentOnDark untuk latar sorotan. Color::hex() tidak dipakai karena memakai
      * tangga terang tetap yang membuat warna gelap jadi pucat.
      *
      * @return array<int, string>
      */
-    private static function charcoal(): array
+    private static function sapphire(): array
     {
         return array_map(Color::convertToOklch(...), [
-            50 => '#FAFAF9',
-            100 => '#F4F4F2',
-            200 => '#E7E5E4',
-            300 => '#D6D3D1',
-            400 => '#A8A29E',
-            500 => '#6B6B73',
-            600 => '#27272A',
-            700 => '#18181B',
-            800 => '#141416',
-            900 => '#0E0E10',
-            950 => '#09090B',
+            50 => '#F4F7FC',
+            100 => '#E8EEFB',
+            200 => '#C7D6FB',
+            300 => '#9DBCFA',
+            400 => '#6A8FE6',
+            500 => '#2B4FC0',
+            600 => '#1E40AF',
+            700 => '#172F86',
+            800 => '#14286F',
+            900 => '#101F57',
+            950 => '#0B163F',
         ]);
     }
 }

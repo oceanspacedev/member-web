@@ -14,6 +14,8 @@
     $description = 'Foto struk belanja, poin langsung masuk, tukar jadi voucher, dan naik level untuk cashback lebih besar. Satu kartu member berlaku di semua brand grup '.$app.'. Gratis untuk iPhone dan Android.';
     $ogImage = asset('images/og-ocean-space.png');
     $cssVersion = @filemtime(public_path('css/landing.css')) ?: 1;
+    // Screenshot aplikasi diberi versi dari waktu file agar browser tidak menampilkan gambar lama setelah diganti.
+    $shot = fn (string $name) => asset("images/landing/{$name}.jpg").'?v='.(@filemtime(public_path("images/landing/{$name}.jpg")) ?: 1);
 
     $faq = [
         ['Apakah '.$app.' gratis?', 'Ya. Aplikasinya gratis diunduh dan dipakai. Kamu hanya membayar belanjamu di outlet, atau voucher berbayar bila kamu memilih membelinya.'],
@@ -57,7 +59,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title }}</title>
     <meta name="description" content="{{ $description }}">
-    <meta name="theme-color" content="#18181B">
+    <meta name="theme-color" content="#1E40AF">
     <link rel="canonical" href="{{ url('/') }}">
 
     <meta property="og:type" content="website">
@@ -100,7 +102,7 @@
                 <li><a href="#faq">FAQ</a></li>
             </ul>
         </nav>
-        <a class="btn btn--gold" href="#unduh">Unduh aplikasi</a>
+        <a class="btn btn--light" href="#unduh">Unduh aplikasi</a>
     </div>
 </header>
 
@@ -130,10 +132,10 @@
 
             <div class="hero__visual">
                 <div class="phone phone--back">
-                    <div class="phone__screen"><img src="{{ asset('images/landing/voucher.jpg') }}" width="646" height="1400" alt="Voucher dengan kode QR dan barcode yang siap dipindai kasir"></div>
+                    <div class="phone__screen"><img src="{{ $shot('voucher') }}" width="646" height="1400" alt="Voucher dengan kode QR dan barcode yang siap dipindai kasir"></div>
                 </div>
                 <div class="phone phone--front">
-                    <div class="phone__screen"><img src="{{ asset('images/landing/home.jpg') }}" width="646" height="1400" fetchpriority="high" alt="Beranda aplikasi {{ $app }}: saldo poin, progres level, dan menu member"></div>
+                    <div class="phone__screen"><img src="{{ $shot('home') }}" width="646" height="1400" fetchpriority="high" alt="Beranda aplikasi {{ $app }}: saldo poin, progres level, dan menu member"></div>
                 </div>
                 <div class="float float--points">
                     <svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><use href="#i-check"/></svg>
@@ -205,17 +207,17 @@
             <div class="head">
                 <span class="eyebrow">Intip aplikasinya</span>
                 <h2>Sederhana dipakai, nyaman dilihat</h2>
-                <p>Tampilan hitam dan emas yang bersih, dengan semua yang penting satu ketukan dari beranda.</p>
+                <p>Tampilan biru yang bersih, dengan semua yang penting satu ketukan dari beranda.</p>
             </div>
             <div class="gallery">
                 @foreach ([
-                    ['home', 'Beranda', 'Saldo poin, progres level, dan semua menu member dalam satu layar.', 'Beranda aplikasi: saldo 10.000 poin, progres menuju level Gold, dan delapan menu member'],
+                    ['home', 'Beranda', 'Saldo poin, progres level, dan semua menu member dalam satu layar.', 'Beranda aplikasi: saldo 12.500 poin, progres menuju level Gold, dan delapan menu member'],
                     ['promo', 'Promo', 'Promo dan voucher dari semua brand, bisa disaring per kategori.', 'Halaman promo berisi kartu promo bergambar dengan filter kategori'],
                     ['voucher', 'Voucher', 'QR dan barcode siap dipindai kasir, atau cukup sebutkan kodenya.', 'Halaman voucher dengan kode QR, barcode, dan kode yang bisa disalin'],
                     ['level', 'Level member', 'Lihat benefit tiap level dan berapa lagi menuju level berikutnya.', 'Halaman level member: kartu Silver, Gold, dan Platinum beserta benefitnya'],
                 ] as [$file, $name, $text, $alt])
                     <figure class="shot">
-                        <div class="phone"><div class="phone__screen"><img src="{{ asset('images/landing/'.$file.'.jpg') }}" width="646" height="1400" loading="lazy" decoding="async" alt="{{ $alt }}"></div></div>
+                        <div class="phone"><div class="phone__screen"><img src="{{ $shot($file) }}" width="646" height="1400" loading="lazy" decoding="async" alt="{{ $alt }}"></div></div>
                         <figcaption><strong>{{ $name }}</strong><span>{{ $text }}</span></figcaption>
                     </figure>
                 @endforeach
@@ -301,7 +303,7 @@
                                 @foreach ($group as $brand)
                                     @php
                                         $logo = \App\Support\Media::url($brand['logo_path']);
-                                        $color = preg_match('/^#[0-9a-f]{3,8}$/i', (string) $brand['color']) ? $brand['color'] : '#18181B';
+                                        $color = preg_match('/^#[0-9a-f]{3,8}$/i', (string) $brand['color']) ? $brand['color'] : '#1E40AF';
                                         $initials = collect(preg_split('/\s+/', trim($brand['name'])))->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->join('');
                                     @endphp
                                     <li class="chip">
@@ -383,7 +385,7 @@
             </div>
             <div class="cta__art">
                 <div class="phone">
-                    <div class="phone__screen"><img src="{{ asset('images/landing/promo.jpg') }}" width="646" height="1400" loading="lazy" decoding="async" alt="Halaman promo aplikasi {{ $app }}"></div>
+                    <div class="phone__screen"><img src="{{ $shot('promo') }}" width="646" height="1400" loading="lazy" decoding="async" alt="Halaman promo aplikasi {{ $app }}"></div>
                 </div>
             </div>
         </div>
