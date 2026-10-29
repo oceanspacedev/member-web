@@ -22,7 +22,7 @@ class VoucherController extends Controller
         $request->validate(['status' => ['nullable', Rule::in(['active', 'history'])]]);
         $vouchers->issueBirthdayVouchers($request->user());
 
-        $query = $request->user()->vouchers()->with(['brand', 'promo', 'outlet']);
+        $query = $request->user()->vouchers()->with(['brand', 'promo', 'outlet', 'posOutlet']);
 
         $list = $request->input('status') === 'history'
             ? $query->history()->latest('updated_at')->limit(50)->get()
@@ -35,7 +35,7 @@ class VoucherController extends Controller
     {
         $this->ensureOwner($request, $voucher);
 
-        return new VoucherResource($voucher->load(['brand', 'promo', 'outlet']));
+        return new VoucherResource($voucher->load(['brand', 'promo', 'outlet', 'posOutlet']));
     }
 
     public function qr(Request $request, Voucher $voucher, VoucherQr $qr): JsonResponse
@@ -52,7 +52,7 @@ class VoucherController extends Controller
         $voucher = $vouchers->acquire($request->user(), $promo);
 
         return response()->json([
-            'voucher' => new VoucherResource($voucher->load(['brand', 'promo'])),
+            'voucher' => new VoucherResource($voucher->load(['brand', 'promo', 'posOutlet'])),
             'loyalty' => $loyalty->summary($request->user()->fresh()),
         ], 201);
     }

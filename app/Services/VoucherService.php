@@ -8,6 +8,7 @@ use App\Models\PointTransaction;
 use App\Models\Promo;
 use App\Models\User;
 use App\Models\Voucher;
+use App\Models\VoucherCode;
 use App\Models\VoucherOrder;
 use App\Services\Payment\PaymentException;
 use App\Services\Payment\PaymentGateway;
@@ -388,13 +389,33 @@ class VoucherService
     {
         $promo?->increment('issued_count');
 
-        return Voucher::create([
+        // Promo dengan kode dari POS outlet: member menerima satu kode impor. Bila stok habis (mis. tagihan
+        // yang sudah lunas setelah kode terakhir diambil), terbitkan kode Space Club agar member tetap mendapat voucher.
+        $posCode = $promo?->usesPosCodes()
+            ? VoucherCode::where('promo_id', $promo->id)->available()->orderBy('id')->lockForUpdate()->first()
+            : null;
+        if ($promo?->usesPosCodes() && ! $posCode) {
+            Log::warning("[Voucher] stok kode POS promo #{$promo->id} habis; voucher member #{$member->id} memakai kode Space Club.");
+        }
+
+        $expires = $attributes['expires_at']->copy();
+        if ($posCode?->expires_on) {
+            $codeEnd = Carbon::parse($posCode->expires_on->toDateString(), $this->tz())->endOfDay();
+            $expires = $codeEnd->lt($expires) ? $codeEnd : $expires;
+        }
+
+        $voucher = Voucher::create([
             'promo_id' => $promo?->id,
             'user_id' => $member->id,
-            'code' => Voucher::generateCode(),
+            'code' => $posCode?->code ?? Voucher::generateCode(),
             ...$attributes,
-            'expires_at' => $attributes['expires_at']->copy()->utc(),
+            'value' => $posCode?->value ?? $attributes['value'],
+            'pos_outlet_id' => $posCode?->outlet_id,
+            'expires_at' => $expires->utc(),
         ]);
+        $posCode?->forceFill(['voucher_id' => $voucher->id])->save();
+
+        return $voucher;
     }
 
     private function tz(): string

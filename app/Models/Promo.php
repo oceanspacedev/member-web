@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'brand_id', 'type', 'title', 'highlight', 'highlight_caption', 'description', 'terms', 'image_path', 'starts_at', 'ends_at', 'is_active',
+    'brand_id', 'pos_outlet_id', 'type', 'title', 'highlight', 'highlight_caption', 'description', 'terms', 'image_path', 'starts_at', 'ends_at', 'is_active',
     'voucher_value', 'min_spend', 'price_points', 'price_rupiah', 'min_tier', 'quota', 'per_member_limit', 'valid_days',
 ])]
 class Promo extends Model
@@ -75,6 +75,23 @@ class Promo extends Model
         return $this->hasMany(Voucher::class);
     }
 
+    /** Outlet yang POS-nya membuat kode voucher promo ini (null = kode dibuat Space Club). */
+    public function posOutlet(): BelongsTo
+    {
+        return $this->belongsTo(Outlet::class, 'pos_outlet_id');
+    }
+
+    /** Kode voucher yang diimpor dari POS outlet. */
+    public function codes(): HasMany
+    {
+        return $this->hasMany(VoucherCode::class);
+    }
+
+    public function usesPosCodes(): bool
+    {
+        return $this->pos_outlet_id !== null;
+    }
+
     public function scopeRunning(Builder $query): void
     {
         $today = now()->toDateString();
@@ -109,6 +126,13 @@ class Promo extends Model
     /** Sisa kuota; tagihan yang belum dibayar (masih berlaku) ikut dihitung sebagai terpesan. */
     public function quotaLeft(): ?int
     {
+        // Kode dari POS: kuota = kode yang masih bisa dibagikan.
+        if ($this->usesPosCodes()) {
+            $reserved = $this->open_orders_count ?? $this->orders()->open()->count();
+
+            return max(0, $this->codes()->available()->count() - $reserved);
+        }
+
         if ($this->quota === null) {
             return null;
         }

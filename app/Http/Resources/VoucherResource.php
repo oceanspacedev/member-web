@@ -27,6 +27,8 @@ class VoucherResource extends JsonResource
             'paid_amount' => $this->paid_amount,
             'brand' => $this->brand_id ? new BrandResource($this->whenLoaded('brand')) : null,
             'is_universal' => $this->brand_id === null,
+            // Kode dari POS outlet: hanya dikenali kasir outlet ini, yang memasukkannya di POS.
+            'pos_outlet' => $this->pos_outlet_id ? ['id' => $this->pos_outlet_id, 'name' => $this->posOutlet?->name] : null,
             'terms' => $this->promo?->terms,
             'image_url' => Media::url($this->promo?->image_path),
             'expires_at' => $this->expires_at->timezone($tz)->toIso8601String(),

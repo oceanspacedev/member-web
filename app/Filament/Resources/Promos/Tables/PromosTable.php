@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources\Promos\Tables;
 
+use App\Filament\Resources\Promos\Pages\EditPromo;
 use App\Models\Promo;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -29,7 +31,8 @@ class PromosTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->defaultSort('ends_at', 'desc')
+            // Yang terakhir diubah (termasuk yang baru menerima kode impor POS) tampil paling atas.
+            ->defaultSort('updated_at', 'desc')
             ->columns([
                 ImageColumn::make('image_path')
                     ->label('Gambar')
@@ -58,6 +61,18 @@ class PromosTable
                     ->formatStateUsing(fn (Promo $record) => $record->issuesVouchers()
                         ? number_format($record->issued_count, 0, ',', '.').($record->quota ? ' / '.number_format($record->quota, 0, ',', '.') : '')
                         : '—')
+                    ->toggleable(),
+                TextColumn::make('pos_codes')
+                    ->label('Kode POS')
+                    ->state(fn (Promo $record) => $record->usesPosCodes()
+                        ? $record->codes()->available()->count().' tersisa · '.$record->posOutlet?->name
+                        : null)
+                    ->placeholder('—')
+                    // Klik untuk langsung membuka daftar kodenya.
+                    ->url(fn (Promo $record) => $record->usesPosCodes() ? EditPromo::getUrl(['record' => $record, 'relation' => '0']) : null)
+                    ->color('primary')
+                    ->icon(fn (Promo $record) => $record->usesPosCodes() ? Heroicon::OutlinedTicket : null)
+                    ->tooltip(fn (Promo $record) => $record->usesPosCodes() ? 'Lihat daftar kode voucher' : null)
                     ->toggleable(),
                 TextColumn::make('ends_at')
                     ->label('Periode')

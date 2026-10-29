@@ -136,7 +136,8 @@ class PromoForm
                         ->minValue(1)
                         ->placeholder('Tanpa batas')
                         ->helperText(fn (?Promo $record) => $record?->issued_count ? "Sudah terbit {$record->issued_count} voucher." : null)
-                        ->visible(fn (Get $get) => $get('type') !== Promo::TYPE_BIRTHDAY),
+                        // Kode dari POS: kuota mengikuti jumlah kode impor yang tersedia.
+                        ->visible(fn (Get $get) => $get('type') !== Promo::TYPE_BIRTHDAY && blank($get('pos_outlet_id'))),
                     TextInput::make('per_member_limit')
                         ->label('Maks. per member')
                         ->integer()
@@ -153,6 +154,17 @@ class PromoForm
                         ->maxValue(365)
                         ->placeholder('Sampai promo berakhir')
                         ->visible(fn (Get $get) => $get('type') !== Promo::TYPE_BIRTHDAY),
+                    Select::make('pos_outlet_id')
+                        ->label('Kode voucher dari POS outlet')
+                        ->relationship('posOutlet', 'name', fn ($query) => $query->where('is_active', true)->orderBy('name'))
+                        ->searchable()
+                        ->preload()
+                        ->placeholder('Dibuat Space Club (QR)')
+                        ->live()
+                        ->helperText(fn (?Promo $record) => $record?->usesPosCodes()
+                            ? 'Member menerima kode yang diimpor dari POS outlet ini (lihat tabel Kode voucher POS di bawah). Sisa kode: '.$record->codes()->available()->count().'. Tambah kode lewat "Impor voucher POS" di daftar promo.'
+                            : 'Kosongkan bila kode dibuat Space Club. Voucher dari POS outlet paling mudah dibuat lewat tombol "Impor voucher POS" di daftar promo.')
+                        ->columnSpanFull(),
                 ]),
             Section::make('Gambar promo (16:9)')
                 ->description('Foto produk (teks besar & judul ditulis aplikasi), atau desain banner yang sudah berisi teks — untuk yang ini kosongkan Teks besar, dan jauhkan teks dari ±15% bagian bawah gambar karena tertutup kartu poin di Beranda.')

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['promo_id', 'user_id', 'code', 'source', 'period', 'title', 'brand_id', 'value', 'min_spend', 'points_spent', 'paid_amount', 'expires_at'])]
+#[Fillable(['promo_id', 'user_id', 'code', 'pos_outlet_id', 'source', 'period', 'title', 'brand_id', 'value', 'min_spend', 'points_spent', 'paid_amount', 'expires_at'])]
 class Voucher extends Model
 {
     public const SOURCE_CLAIM = 'claim';
@@ -120,6 +120,17 @@ class Voucher extends Model
     /** Kode untuk dibacakan: ABCDE-FGHJK. */
     public function displayCode(): string
     {
+        // Kode dari POS ditampilkan persis seperti di POS, agar kasir mengetiknya tanpa tanda hubung tambahan.
+        if ($this->pos_outlet_id) {
+            return $this->code;
+        }
+
         return implode('-', str_split($this->code, 5));
+    }
+
+    /** Outlet yang POS-nya mengenali kode ini (voucher dari kode impor POS); null = kode Space Club. */
+    public function posOutlet(): BelongsTo
+    {
+        return $this->belongsTo(Outlet::class, 'pos_outlet_id');
     }
 }
