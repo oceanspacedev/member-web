@@ -34,8 +34,9 @@
         <env name="XENDIT_CALLBACK_TOKEN" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
-        <!-- Tes tidak pernah memanggil Gemini sungguhan; pembaca diganti tiruan per tes. -->
+        <!-- Tes tidak pernah memanggil Gemini/router AI sungguhan; pembaca diganti tiruan per tes. -->
         <env name="GEMINI_API_KEY" value=""/>
+        <env name="OPENAI_COMPATIBLE_API_KEY" value=""/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>

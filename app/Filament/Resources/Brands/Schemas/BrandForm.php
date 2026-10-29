@@ -67,6 +67,16 @@ class BrandForm
                         ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/webp'])
                         ->maxSize(3072),
                 ]),
+            Section::make('Ciri struk')
+                ->description('Dibaca AI saat memeriksa foto struk member: untuk mengenali struk asli brand ini dan menolak struk dari toko lain. Tidak tampil di aplikasi.')
+                ->schema([
+                    Textarea::make('receipt_guide')
+                        ->label('Ciri struk brand ini')
+                        ->placeholder('Contoh: Struk thermal berkop "NAMA OUTLET", nomor struk = "No. Kwitansi #...", tanggal DD/MM/YYYY, total = "TOTAL". Slip "INTERNAL" bukan bukti belanja.')
+                        ->helperText('Tulis kop/nama di struk, format nomor struk, format tanggal, letak total, dan jenis nota yang bukan belanja member.')
+                        ->rows(6)
+                        ->maxLength(4000),
+                ]),
         ]);
     }
 }

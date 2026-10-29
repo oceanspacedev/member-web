@@ -18,6 +18,23 @@ final class ReceiptReading
 
     public const CAPTURE_OTHER = 'other';
 
+    /** Struk dari salah satu outlet Space Club di daftar. */
+    public const MERCHANT_MEMBER = 'member_outlet';
+
+    /** Jelas dari usaha lain (minimarket, restoran lain, dll.): tidak bisa ditukar poin. */
+    public const MERCHANT_OTHER = 'other_merchant';
+
+    public const MERCHANT_UNCLEAR = 'unclear';
+
+    /** Member membeli dari outlet: satu-satunya transaksi yang mendapat poin. */
+    public const TRANSACTION_PURCHASE = 'purchase';
+
+    /** Outlet membeli barang dari pelanggan (mis. faktur beli toko emas). */
+    public const TRANSACTION_BUYBACK = 'buyback';
+
+    /** Bukan bukti pembayaran belanja (tagihan belum dibayar, slip pesanan, dll.). */
+    public const TRANSACTION_OTHER = 'other';
+
     /**
      * @param  list<string>  $tamperSigns  tanda editan yang terlihat (angka ditimpa, font beda, dll.)
      */
@@ -34,6 +51,8 @@ final class ReceiptReading
         public readonly array $tamperSigns,
         public readonly float $confidence,
         public readonly ?string $notes = null,
+        public readonly string $merchantMatch = self::MERCHANT_UNCLEAR,
+        public readonly string $transactionType = self::TRANSACTION_PURCHASE,
     ) {}
 
     /** @param  array<string, mixed>  $data */
@@ -48,14 +67,41 @@ final class ReceiptReading
             outletId: isset($data['outlet_id']) && is_numeric($data['outlet_id']) ? (int) $data['outlet_id'] : null,
             merchantName: $string('merchant_name'),
             receiptNumber: $string('receipt_number'),
-            purchasedAt: $string('purchased_at'),
+            purchasedAt: self::normalizeDate($string('purchased_at')),
             total: is_numeric($total) ? (int) round((float) $total) : null,
             capture: in_array($data['capture'] ?? null, self::captures(), true) ? $data['capture'] : self::CAPTURE_OTHER,
             tamperSuspected: (bool) ($data['tamper_suspected'] ?? false),
             tamperSigns: array_values(array_filter(array_map('strval', (array) ($data['tamper_signs'] ?? [])))),
             confidence: max(0.0, min(1.0, (float) ($data['confidence'] ?? 0))),
             notes: $string('notes'),
+            merchantMatch: in_array($data['merchant_match'] ?? null, self::merchantMatches(), true) ? $data['merchant_match'] : self::MERCHANT_UNCLEAR,
+            transactionType: in_array($data['transaction_type'] ?? null, self::transactionTypes(), true) ? $data['transaction_type'] : self::TRANSACTION_PURCHASE,
         );
+    }
+
+    /**
+     * Model kadang menulis detik atau pemisah "T" (2026-10-28 13:29:50, 2026-10-28T13:29):
+     * samakan ke "Y-m-d H:i" agar struk yang terbaca jelas tidak dianggap tak terbaca.
+     */
+    private static function normalizeDate(?string $value): ?string
+    {
+        if ($value && preg_match('/^(\d{4}-\d{2}-\d{2})(?:[ T](\d{2}:\d{2})(?::\d{2}(?:\.\d+)?)?)?$/', $value, $m)) {
+            return isset($m[2]) ? "{$m[1]} {$m[2]}" : $m[1];
+        }
+
+        return $value;
+    }
+
+    /** @return list<string> */
+    public static function merchantMatches(): array
+    {
+        return [self::MERCHANT_MEMBER, self::MERCHANT_OTHER, self::MERCHANT_UNCLEAR];
+    }
+
+    /** @return list<string> */
+    public static function transactionTypes(): array
+    {
+        return [self::TRANSACTION_PURCHASE, self::TRANSACTION_BUYBACK, self::TRANSACTION_OTHER];
     }
 
     /** @return list<string> */
@@ -80,6 +126,8 @@ final class ReceiptReading
             'tamper_signs' => $this->tamperSigns,
             'confidence' => $this->confidence,
             'notes' => $this->notes,
+            'merchant_match' => $this->merchantMatch,
+            'transaction_type' => $this->transactionType,
         ];
     }
 }

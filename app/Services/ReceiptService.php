@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Outlet;
-use App\Models\PointTransaction;
 use App\Models\ReceiptClaim;
 use App\Models\User;
 use App\Services\Receipts\ReceiptImage;
@@ -217,17 +216,8 @@ class ReceiptService
      */
     private function ensureNotClaimed(Outlet $outlet, string $number): void
     {
-        $claimed = ReceiptClaim::where('outlet_id', $outlet->id)
-            ->where('receipt_number', $number)
-            ->where('status', ReceiptClaim::STATUS_APPROVED)
-            ->exists();
-
-        $recorded = PointTransaction::where('outlet_id', $outlet->id)
-            ->where('type', PointTransaction::TYPE_EARN)
-            ->where('reference', $number)
-            ->exists();
-
-        if ($claimed || $recorded) {
+        // Termasuk nomor yang terbaca mirip (mis. 0 dan O), lihat ReceiptClaim::matchKey.
+        if (ReceiptClaim::alreadyEarned($outlet->id, $number)) {
             $this->fail('receipt_number', "Struk {$number} di outlet ini sudah pernah mendapat poin.");
         }
     }

@@ -38,17 +38,23 @@ return [
 
     /*
     | Poin dari foto struk (outlet dengan POS pihak ketiga). Sistem yang memeriksa: foto dibaca
-    | otomatis (Gemini), dicek dengan aturan di bawah, lalu poin langsung masuk bila lolos.
+    | otomatis (Gemini atau router AI OpenAI-compatible), dicek dengan aturan di bawah, lalu poin langsung masuk bila lolos.
     | Hanya struk yang meragukan yang masuk antrean admin, dengan data yang sudah terisi.
     */
     'receipts' => [
         'max_age_days' => (int) env('LOYALTY_RECEIPT_MAX_AGE_DAYS', 7),
         'daily_limit' => (int) env('LOYALTY_RECEIPT_DAILY_LIMIT', 5),
 
-        // gemini = baca otomatis dengan Gemini (butuh GEMINI_API_KEY); none = semua ke admin.
-        'reader' => env('LOYALTY_RECEIPT_READER', 'gemini'),
+        // auto/gemini = Gemini langsung bila GEMINI_API_KEY diisi, selain itu router AI OpenAI-compatible
+        // bila OPENAI_COMPATIBLE_* diisi; openai = hanya router; none = semua ke admin.
+        'reader' => env('LOYALTY_RECEIPT_READER', 'auto'),
         'model' => env('LOYALTY_RECEIPT_MODEL', 'gemini-3.8-flash'),
         'gemini_key' => env('GEMINI_API_KEY'),
+        'openai_compatible' => [
+            'url' => env('OPENAI_COMPATIBLE_BASE_URL'),
+            'key' => env('OPENAI_COMPATIBLE_API_KEY'),
+            'model' => env('OPENAI_COMPATIBLE_MODEL'),
+        ],
 
         // Di atas batas ini selalu diperiksa admin, sekecil apa pun kecurigaannya.
         'auto_approve_max_amount' => (int) env('LOYALTY_RECEIPT_AUTO_MAX_AMOUNT', 2_000_000),

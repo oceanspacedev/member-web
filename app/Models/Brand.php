@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'slug', 'category', 'legal_entity', 'color', 'logo_path', 'description'])]
+#[Fillable(['name', 'slug', 'category', 'legal_entity', 'color', 'logo_path', 'description', 'receipt_guide'])]
 class Brand extends Model
 {
     use DeletesReplacedMedia;

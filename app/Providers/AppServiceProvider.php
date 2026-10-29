@@ -7,6 +7,7 @@ use App\Services\Payment\PaymentGateway;
 use App\Services\Payment\XenditGateway;
 use App\Services\Receipts\GeminiReceiptReader;
 use App\Services\Receipts\NullReceiptReader;
+use App\Services\Receipts\OpenAiCompatibleReceiptReader;
 use App\Services\Receipts\ReceiptReader;
 use App\Services\WhatsApp\DemoNumberSender;
 use App\Services\WhatsApp\LogWhatsAppSender;
@@ -36,12 +37,18 @@ class AppServiceProvider extends ServiceProvider
         ]));
 
         // Pembaca struk otomatis; tanpa kunci API semua struk diperiksa admin seperti sebelumnya.
+        // Gemini langsung didahulukan; router OpenAI-compatible dipakai bila Gemini tidak dikonfigurasi.
         $this->app->bind(ReceiptReader::class, function () {
             $cfg = config('loyalty.receipts');
+            $router = $cfg['openai_compatible'] ?? [];
+            $hasRouter = filled($router['url'] ?? null) && filled($router['key'] ?? null) && filled($router['model'] ?? null);
 
-            return $cfg['reader'] === 'gemini' && filled($cfg['gemini_key'])
-                ? new GeminiReceiptReader($cfg['gemini_key'], $cfg['model'])
-                : new NullReceiptReader;
+            return match (true) {
+                $cfg['reader'] === 'none' => new NullReceiptReader,
+                $cfg['reader'] !== 'openai' && filled($cfg['gemini_key']) => new GeminiReceiptReader($cfg['gemini_key'], $cfg['model']),
+                $hasRouter => new OpenAiCompatibleReceiptReader($router['key'], $router['url'], $router['model']),
+                default => new NullReceiptReader,
+            };
         });
 
         $this->app->bind(PaymentGateway::class, function () {

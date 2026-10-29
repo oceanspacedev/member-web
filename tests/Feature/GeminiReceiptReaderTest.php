@@ -24,7 +24,7 @@ class GeminiReceiptReaderTest extends TestCase
     private function outlets()
     {
         $brand = Brand::create(['name' => 'J Chicken', 'slug' => 'j-chicken', 'category' => 'fastfood']);
-        Outlet::create(['brand_id' => $brand->id, 'name' => 'J Chicken Ciledug', 'city' => 'Tangerang']);
+        Outlet::create(['brand_id' => $brand->id, 'name' => 'J Chicken Ciledug', 'city' => 'Cirebon']);
 
         return Outlet::with('brand')->get();
     }

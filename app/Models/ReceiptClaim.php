@@ -63,6 +63,61 @@ class ReceiptClaim extends Model
         return strtoupper(preg_replace('/\s+/', '', trim($number)) ?? '');
     }
 
+    /**
+     * Kunci pembanding nomor struk yang tahan salah baca: tanda baca dibuang ("#4-10373" = "4-10373")
+     * dan huruf yang mirip angka disamakan (O/Q→0, I/L→1, Z→2, S→5, G→6, B→8), sehingga foto ulang
+     * struk yang sama tetap dikenali walau satu karakter terbaca berbeda.
+     */
+    public static function matchKey(string $number): string
+    {
+        $plain = preg_replace('/[^A-Z0-9]/', '', self::normalizeNumber($number)) ?? '';
+
+        return strtr($plain, ['O' => '0', 'Q' => '0', 'I' => '1', 'L' => '1', 'Z' => '2', 'S' => '5', 'G' => '6', 'B' => '8']);
+    }
+
+    /**
+     * Struk dengan nomor ini (atau yang terbaca mirip) di outlet ini sudah pernah mendapat poin: lewat
+     * klaim foto yang disetujui, atau lewat kasir (referensi transaksi poin).
+     */
+    public static function alreadyEarned(int $outletId, string $number, ?int $exceptClaimId = null): bool
+    {
+        $key = self::matchKey($number);
+        if ($key === '') {
+            return false;
+        }
+
+        $claimed = self::where('outlet_id', $outletId)
+            ->where('receipt_key', $key)
+            ->where('status', self::STATUS_APPROVED)
+            ->when($exceptClaimId, fn ($q) => $q->whereKeyNot($exceptClaimId))
+            ->exists();
+        if ($claimed) {
+            return true;
+        }
+
+        $earned = PointTransaction::where('outlet_id', $outletId)->where('type', PointTransaction::TYPE_EARN);
+        if ($earned->clone()->where('reference', self::normalizeNumber($number))->exists()) {
+            return true;
+        }
+
+        // Referensi kasir tidak punya kunci tersimpan; struk hanya bisa diklaim beberapa hari setelah
+        // belanja, jadi cukup bandingkan transaksi kasir yang baru.
+        $recent = now()->subDays(config('loyalty.receipts.max_age_days') + 2);
+
+        return $earned->whereNotNull('reference')->where('created_at', '>=', $recent)->pluck('reference')
+            ->contains(fn (string $reference) => self::matchKey($reference) === $key);
+    }
+
+    protected static function booted(): void
+    {
+        // Kunci pembanding selalu mengikuti nomor struk, dari jalur mana pun nomor itu diisi.
+        static::saving(function (self $claim) {
+            if ($claim->isDirty('receipt_number')) {
+                $claim->receipt_key = $claim->receipt_number ? self::matchKey($claim->receipt_number) : null;
+            }
+        });
+    }
+
     // Termasuk akun yang sudah dihapus agar riwayat tetap tampil.
     public function user(): BelongsTo
     {

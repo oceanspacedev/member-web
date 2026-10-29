@@ -134,6 +134,19 @@ class ReceiptAutoVerificationTest extends TestCase
             ->assertJsonPath('data.outlet.name', 'J Chicken Ciledug');
     }
 
+    public function test_purchase_times_written_with_seconds_are_still_understood(): void
+    {
+        $at = now(config('loyalty.timezone'))->subHour();
+        $this->send($this->clearReceipt(['purchased_at' => $at->format('Y-m-d H:i:s')]))->assertCreated();
+
+        $claim = $this->latest();
+        $this->assertSame(ReceiptClaim::STATUS_APPROVED, $claim->status);
+        $this->assertSame($at->toDateString(), $claim->purchased_at->toDateString());
+
+        $this->assertSame('2026-10-28 13:29', ReceiptReading::fromArray(['purchased_at' => '2026-10-28T13:29:50.123'])->purchasedAt);
+        $this->assertSame('2026-10-28', ReceiptReading::fromArray(['purchased_at' => '2026-10-28'])->purchasedAt);
+    }
+
     public function test_members_cannot_see_someone_elses_receipt(): void
     {
         $this->send($this->clearReceipt())->assertCreated();
@@ -152,6 +165,16 @@ class ReceiptAutoVerificationTest extends TestCase
 
         $this->send($this->clearReceipt(['purchased_at' => now(config('loyalty.timezone'))->subDays(9)->format('Y-m-d H:i'), 'receipt_number' => 'OLD-1']), 603);
         $this->assertStringContainsString('lebih dari 7 hari', $this->latest()->reject_reason);
+
+        // Struk minimarket/toko lain yang terbaca jelas tidak pernah dapat poin.
+        $this->send($this->clearReceipt(['merchant_match' => 'other_merchant', 'outlet_id' => null, 'merchant_name' => 'MINIMARKET LAIN CILEDUG', 'receipt_number' => 'MM-1']), 604);
+        $this->assertSame(ReceiptVerifier::OTHER_MERCHANT, $this->latest()->reject_reason);
+
+        // Foto dari layar atau tangkapan layar: member diminta memfoto kertas struknya.
+        $this->send($this->clearReceipt(['capture' => 'photo_of_screen', 'receipt_number' => 'SC-1']), 605);
+        $this->assertSame(ReceiptVerifier::NOT_PAPER, $this->latest()->reject_reason);
+        $this->send($this->clearReceipt(['capture' => 'screenshot', 'receipt_number' => 'SC-2']), 606);
+        $this->assertSame(ReceiptVerifier::NOT_PAPER, $this->latest()->reject_reason);
 
         foreach (ReceiptClaim::all() as $claim) {
             $this->assertSame(ReceiptClaim::STATUS_REJECTED, $claim->status);
@@ -177,16 +200,55 @@ class ReceiptAutoVerificationTest extends TestCase
         $this->assertSame(2, PointTransaction::count());
     }
 
+    public function test_a_retaken_photo_is_recognised_even_when_the_receipt_number_is_misread(): void
+    {
+        config(['loyalty.receipts.auto_per_outlet_per_day' => 10]);
+        $at = now(config('loyalty.timezone'))->subHour();
+
+        $this->send($this->clearReceipt(['receipt_number' => '#INV-0001', 'purchased_at' => $at->format('Y-m-d H:i')]), 650);
+        $first = $this->latest();
+        $this->assertSame(ReceiptClaim::STATUS_APPROVED, $first->status);
+
+        // Foto ulang: tanda baca hilang dan angka 0 terbaca huruf O — tetap dikenali sebagai struk yang sama.
+        $this->send($this->clearReceipt(['receipt_number' => 'INV-OOO1', 'purchased_at' => $at->format('Y-m-d H:i')]), 651);
+        $this->assertSame('Struk ini sudah pernah mendapat poin.', $this->latest()->reject_reason);
+
+        // Nomor terbaca jauh berbeda, tetapi outlet, jam transaksi, dan total sama: petugas yang memutuskan.
+        $this->send($this->clearReceipt(['receipt_number' => 'INV-7777', 'purchased_at' => $at->format('Y-m-d H:i')]), 652);
+        $twin = $this->latest();
+        $this->assertSame(ReceiptClaim::DECISION_NEEDS_REVIEW, $twin->decision);
+        $this->assertStringContainsString("Kemungkinan struk yang sama dengan klaim #{$first->id}", implode(' ', $twin->flags));
+
+        // Belanja lain dengan total sama di jam berbeda tetap dapat poin.
+        $this->send($this->clearReceipt(['receipt_number' => 'INV-0002', 'purchased_at' => $at->copy()->subMinutes(40)->format('Y-m-d H:i')]), 653);
+        $this->assertSame(ReceiptClaim::STATUS_APPROVED, $this->latest()->status);
+
+        // Referensi kasir yang terbaca mirip (I dan 1) juga dikenali.
+        app(LoyaltyService::class)->earn($this->member, $this->outlet, 50_000, 'KASIR-19');
+        $this->send($this->clearReceipt(['receipt_number' => 'KAS1R-I9']), 654);
+        $this->assertSame('Struk ini sudah pernah mendapat poin.', $this->latest()->reject_reason);
+
+        $this->assertSame(ReceiptClaim::matchKey('INV-0001'), ReceiptClaim::matchKey(' #inv 0001 '));
+        $this->assertSame(ReceiptClaim::matchKey('CML-FJ-20261028-0030'), ReceiptClaim::matchKey('CMI FJ 2O26lO28 OO3O'));
+        $this->assertNotSame(ReceiptClaim::matchKey('INV-0001'), ReceiptClaim::matchKey('INV-0002'));
+    }
+
     public function test_suspicious_receipts_go_to_the_admin_with_the_reasons_and_prefilled_data(): void
     {
         config(['loyalty.receipts.daily_limit' => 10]);
         $cases = [
             'Tanda editan' => $this->clearReceipt(['receipt_number' => 'A-1', 'tamper_suspected' => true, 'tamper_signs' => ['Angka total memakai font berbeda']]),
-            'Tangkapan layar' => $this->clearReceipt(['receipt_number' => 'A-2', 'capture' => 'screenshot']),
+            // Pembaca ragu apakah ini tangkapan layar; struk elektronik selalu dicek petugas.
+            'Tangkapan layar' => $this->clearReceipt(['receipt_number' => 'A-2', 'capture' => 'screenshot', 'confidence' => 0.7]),
+            'Struk elektronik' => $this->clearReceipt(['receipt_number' => 'A-10', 'capture' => 'digital_receipt']),
             'Keyakinan baca rendah' => $this->clearReceipt(['receipt_number' => 'A-3', 'confidence' => 0.5]),
             'Outlet tidak dikenali' => $this->clearReceipt(['receipt_number' => 'A-4', 'outlet_id' => null, 'merchant_name' => 'Warung Lain']),
             'Total di atas batas' => $this->clearReceipt(['receipt_number' => 'A-5', 'total' => 5_000_000]),
             'setelah tanggal kirim' => $this->clearReceipt(['receipt_number' => 'A-6', 'purchased_at' => now(config('loyalty.timezone'))->addDays(3)->format('Y-m-d')]),
+            // Pembaca ragu apakah ini toko lain: admin yang memutuskan.
+            'Kemungkinan struk toko lain' => $this->clearReceipt(['receipt_number' => 'A-7', 'merchant_match' => 'other_merchant', 'outlet_id' => null, 'merchant_name' => 'TOKO X', 'confidence' => 0.6]),
+            'Faktur beli' => $this->clearReceipt(['receipt_number' => 'A-8', 'transaction_type' => 'buyback']),
+            'Bukan bukti pembayaran' => $this->clearReceipt(['receipt_number' => 'A-9', 'transaction_type' => 'other']),
         ];
 
         $width = 620;
@@ -209,12 +271,14 @@ class ReceiptAutoVerificationTest extends TestCase
     {
         config(['loyalty.receipts.auto_per_outlet_per_day' => 2]);
 
+        // Tiga belanja berbeda (total berbeda) di outlet yang sama pada hari yang sama.
         $this->send($this->clearReceipt(['receipt_number' => 'D-1']), 640);
-        $this->send($this->clearReceipt(['receipt_number' => 'D-2']), 641);
-        $this->send($this->clearReceipt(['receipt_number' => 'D-3']), 642);
+        $this->send($this->clearReceipt(['receipt_number' => 'D-2', 'total' => 90_000]), 641);
+        $this->send($this->clearReceipt(['receipt_number' => 'D-3', 'total' => 120_000]), 642);
 
         $this->assertSame(2, ReceiptClaim::where('status', ReceiptClaim::STATUS_APPROVED)->count());
         $this->assertSame(ReceiptClaim::DECISION_NEEDS_REVIEW, $this->latest()->decision);
+        $this->assertStringContainsString('beberapa kali klaim', implode(' ', $this->latest()->flags));
     }
 
     public function test_when_the_reader_is_down_the_receipt_waits_for_an_admin_instead_of_failing(): void

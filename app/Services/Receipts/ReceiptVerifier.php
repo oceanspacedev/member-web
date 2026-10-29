@@ -3,7 +3,6 @@
 namespace App\Services\Receipts;
 
 use App\Models\Outlet;
-use App\Models\PointTransaction;
 use App\Models\ReceiptClaim;
 use Carbon\CarbonImmutable;
 use Throwable;
@@ -11,14 +10,18 @@ use Throwable;
 /**
  * Aturan keputusan struk, terpisah dari pembaca agar bisa diaudit dan dites.
  *
- * - Tolak otomatis: masalah yang pasti dan bisa diperbaiki member (bukan struk, tidak terbaca,
- *   terlalu lama, sudah pernah dapat poin). Alasan ditulis untuk member.
+ * - Tolak otomatis: masalah yang pasti dan bisa diperbaiki member (bukan struk, struk toko lain,
+ *   foto dari layar, tidak terbaca, terlalu lama, sudah pernah dapat poin). Alasan ditulis untuk member.
  * - Periksa admin: ada tanda kecurangan atau keraguan. Alasan ditulis untuk admin.
  * - Setujui otomatis: semua aturan lolos.
  */
 class ReceiptVerifier
 {
     public const UNREADABLE = 'Struk tidak terbaca jelas. Foto ulang seluruh struk dengan cahaya cukup; nomor struk, tanggal, dan total harus terlihat.';
+
+    public const OTHER_MERCHANT = 'Struk ini bukan dari outlet Space Club. Poin hanya untuk belanja di outlet Space Club.';
+
+    public const NOT_PAPER = 'Foto ini diambil dari layar, bukan dari kertas struk. Foto langsung kertas struk dari kasir agar poin bisa masuk.';
 
     /**
      * @return array{decision: string, reason?: string, flags?: list<string>, outlet?: Outlet, number?: string, amount?: int, purchased?: CarbonImmutable}
@@ -32,6 +35,19 @@ class ReceiptVerifier
 
         if (! $reading->isReceipt) {
             return $this->reject('Foto ini bukan struk belanja. Foto struk dari kasir outlet Space Club.');
+        }
+
+        // Struk minimarket/toko lain tidak pernah dapat poin; bila pembaca ragu, admin yang memutuskan.
+        $otherMerchant = $reading->merchantMatch === ReceiptReading::MERCHANT_OTHER;
+        if ($otherMerchant && $confident) {
+            return $this->reject(self::OTHER_MERCHANT);
+        }
+
+        // Foto layar/tangkapan layar bisa diperbaiki member sendiri (foto ulang kertasnya), jadi langsung
+        // ditolak dengan alasan jelas. Bila pembaca ragu, admin yang memutuskan.
+        $fromScreen = in_array($reading->capture, [ReceiptReading::CAPTURE_SCREEN, ReceiptReading::CAPTURE_SCREENSHOT], true);
+        if ($fromScreen && $confident) {
+            return $this->reject(self::NOT_PAPER);
         }
 
         $purchased = $this->parseDate($reading->purchasedAt, $tz);
@@ -49,14 +65,21 @@ class ReceiptVerifier
             return $this->reject("Struk lebih dari {$maxAge} hari tidak bisa diklaim. Kirim struk paling lambat {$maxAge} hari setelah belanja.");
         }
 
-        if ($outlet && $this->alreadyEarned($outlet, $number)) {
+        if ($outlet && ReceiptClaim::alreadyEarned($outlet->id, $number, $claim->id)) {
             return $this->reject('Struk ini sudah pernah mendapat poin.');
         }
 
         $flags = [];
 
-        if (! $outlet) {
+        if ($otherMerchant) {
+            $flags[] = 'Kemungkinan struk toko lain'.($reading->merchantName ? " (tertulis: {$reading->merchantName})" : '').'.';
+        } elseif (! $outlet) {
             $flags[] = 'Outlet tidak dikenali dari struk'.($reading->merchantName ? " (tertulis: {$reading->merchantName})" : '').'.';
+        }
+        if ($reading->transactionType === ReceiptReading::TRANSACTION_BUYBACK) {
+            $flags[] = 'Faktur beli: outlet membeli barang dari pelanggan, bukan belanja member.';
+        } elseif ($reading->transactionType === ReceiptReading::TRANSACTION_OTHER) {
+            $flags[] = 'Bukan bukti pembayaran belanja (mis. tagihan belum dibayar atau slip internal).';
         }
         if ($reading->tamperSuspected || $reading->tamperSigns) {
             $flags[] = 'Tanda editan: '.($reading->tamperSigns ? implode('; ', $reading->tamperSigns) : 'terdeteksi').'.';
@@ -89,6 +112,9 @@ class ReceiptVerifier
         }
         if ($outlet && $this->samePendingNumber($claim, $outlet, $number)) {
             $flags[] = 'Nomor struk sama dengan klaim lain yang sedang diproses.';
+        }
+        if ($outlet && ($twin = $this->sameFingerprint($claim, $outlet, $reading, $number))) {
+            $flags[] = "Kemungkinan struk yang sama dengan klaim #{$twin->id}: outlet, jam transaksi, dan total sama, nomor terbaca berbeda.";
         }
         if ($outlet && $this->approvedToday($claim, $outlet, $purchased) >= $cfg['auto_per_outlet_per_day']) {
             $flags[] = 'Member sudah beberapa kali klaim di outlet ini pada hari yang sama.';
@@ -126,20 +152,37 @@ class ReceiptVerifier
         }
     }
 
-    private function alreadyEarned(Outlet $outlet, string $number): bool
-    {
-        return ReceiptClaim::where('outlet_id', $outlet->id)->where('receipt_number', $number)->where('status', ReceiptClaim::STATUS_APPROVED)->exists()
-            || PointTransaction::where('outlet_id', $outlet->id)->where('type', PointTransaction::TYPE_EARN)->where('reference', $number)->exists();
-    }
-
-    /** Klaim lain (milik siapa pun) dengan nomor yang sama yang belum selesai. */
+    /** Klaim lain (milik siapa pun) dengan nomor yang sama atau terbaca mirip yang belum selesai. */
     private function samePendingNumber(ReceiptClaim $claim, Outlet $outlet, string $number): bool
     {
         return ReceiptClaim::whereKeyNot($claim->id)
             ->where('status', ReceiptClaim::STATUS_PENDING)
             ->where(fn ($q) => $q->where('outlet_id', $outlet->id)->orWhereNull('outlet_id'))
-            ->where('receipt_number', $number)
+            ->where('receipt_key', ReceiptClaim::matchKey($number))
             ->exists();
+    }
+
+    /**
+     * Sidik jari kedua bila nomor struk salah baca: klaim lain (belum ditolak) di outlet yang sama dengan
+     * jam transaksi (sampai menit) dan total yang sama, tetapi nomornya berbeda. Tanpa jam, tanggal dan
+     * total saja terlalu umum (dua pembeli bisa membayar sama di hari yang sama), jadi tidak dicek.
+     */
+    private function sameFingerprint(ReceiptClaim $claim, Outlet $outlet, ReceiptReading $reading, string $number): ?ReceiptClaim
+    {
+        if (! $reading->total || strlen((string) $reading->purchasedAt) <= 10) {
+            return null;
+        }
+
+        $since = now()->subDays(config('loyalty.receipts.max_age_days') + 2);
+
+        return ReceiptClaim::whereKeyNot($claim->id)
+            ->where('outlet_id', $outlet->id)
+            ->where('status', '!=', ReceiptClaim::STATUS_REJECTED)
+            ->where('amount', $reading->total)
+            ->where('created_at', '>=', $since)
+            ->where(fn ($q) => $q->whereNull('receipt_key')->orWhere('receipt_key', '!=', ReceiptClaim::matchKey($number)))
+            ->get()
+            ->first(fn (ReceiptClaim $other) => substr((string) ($other->reading['purchased_at'] ?? ''), 0, 16) === $reading->purchasedAt);
     }
 
     private function approvedToday(ReceiptClaim $claim, Outlet $outlet, CarbonImmutable $purchased): int
