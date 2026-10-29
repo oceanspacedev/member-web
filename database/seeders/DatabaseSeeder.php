@@ -26,11 +26,11 @@ class DatabaseSeeder extends Seeder
             ['Araichi Ramen', 'culinary', 'CV. Arabumi Panca Abadi', '#9A3B1E', [['Araichi Ramen', null, null, null]]],
             ['Ulon', 'culinary', 'PT. Penta Boga Perkasa / CV. Ciledug Boga Perkasa', '#3F5A2A', [
                 ['Ulon Pekanbaru', 'Pekanbaru', 0.5070677, 101.4477793],
-                ['Ulon Ciledug', 'Tangerang', -6.2297, 106.7110],
+                ['Ulon Ciledug', 'Cirebon', -6.9010, 108.7400],
             ]],
             ['J Chicken', 'fastfood', 'PT. Senaraya Indonesia Prima / PT. Kreasi Lima Cahaya', '#C2410C', [
                 ['J Chicken Tuparev', null, null, null],
-                ['J Chicken Ciledug', 'Tangerang', -6.2310, 106.7125],
+                ['J Chicken Ciledug', 'Cirebon', -6.9020, 108.7415],
             ]],
             ['Luuca', 'fastfood', 'PT. Kreasi Lima Cahaya', '#7A3E9D', [['Luuca', null, null, null]]],
             ['Momoyo', 'fastfood', 'Complete Kulinari', '#B4235A', [['Momoyo', null, null, null]]],

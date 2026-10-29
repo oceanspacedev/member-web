@@ -20,7 +20,8 @@ class DirectoryTest extends TestCase
 
     public function test_outlets_are_sorted_by_distance(): void
     {
-        $outlets = $this->getJson('/api/v1/outlets?lat=-6.23&lng=106.71')->assertOk()->json('data');
+        // Dari Ciledug, Kab. Cirebon: outlet Ciledug paling dekat.
+        $outlets = $this->getJson('/api/v1/outlets?lat=-6.90&lng=108.74')->assertOk()->json('data');
 
         $this->assertStringContainsString('Ciledug', $outlets[0]['name']);
         $this->assertNotNull($outlets[0]['distance_km']);
